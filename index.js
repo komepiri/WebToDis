@@ -1,11 +1,11 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const express = require('express');
 
-const app = express();
-const app2 = express();
+const app = express(); // API Server
+const app2 = express(); // Web Server
 
-const port1 = 3001;
-const port2 = 3000;
+const port1 = 3001; // API Server Port
+const port2 = 3000; // Web Server Port
 
 app2.use(express.static('src'));
 
