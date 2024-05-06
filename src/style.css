@@ -1,0 +1,92 @@
+input[type="submit"] {
+    background-color: #1e5024;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    margin: 4px 2px;
+    cursor: pointer;
+    border: none;
+    border-radius: 50px;
+}
+
+input:hover {
+    background-color: #404080;
+}
+
+.inText {
+    box-sizing: border-box;
+    margin: 0;
+    vertical-align: top;
+    width: 100%;
+    max-width: 250px;
+    height: 56px;
+    background: #333333;
+    border: 2px solid #1e5024;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 19px;
+    color: #ffffff;
+    font-weight: bold;
+    letter-spacing: .1em;
+}
+
+.inText:focus {
+    border-color: #404080;
+    background: rgba(64, 64, 128, 0.20);
+    outline: 0;
+}
+
+.inText::-ms-clear {
+    display: none;
+}
+
+.textArea {
+    width: 250px;
+    background: #333333;
+    border: 2px solid #1e5024;
+    border-radius: 4px;
+    padding: 7px;
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: bold;
+    letter-spacing: .1em;
+    line-height: 16px;
+}
+
+.textArea:focus {
+    border-color: #404080;
+    background: rgba(64, 64, 128, 0.20);
+    outline: 0;
+}
+
+h1 {
+    background-color: #4c4c4c;
+    text-align: center;
+    color: #ffffff;
+}
+
+body {
+    font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+    background-color: #36393e;
+    color: #ffffff;
+}
+
+.head {
+                text-align: center;
+                background-color: #4c4c5c;
+                color: #fff;
+            	position: fixed;
+            	top: 0;
+	            left: 0;
+	            width: 100%;
+            	padding: 5px 0;
+	            margin: 0 auto;
+	            box-shadow:0 2px 8px rgba(30,30,80,.3);
+}
+
+a:link { color: white; }
+a:visited { color: #d3d3d3; }

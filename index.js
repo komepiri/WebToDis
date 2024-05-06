@@ -1,15 +1,64 @@
 const { Client, GatewayIntentBits } = require('discord.js');
+const bodyParser = require('body-parser')
 const express = require('express');
+const cors = require('cors');
 
-const app = express(); // API Server
-const app2 = express(); // Web Server
+const app = express();
+const app2 = express();
 
-const port1 = 3001; // API Server Port
-const port2 = 3000; // Web Server Port
+const port1 = 3001;
+const port2 = 3000;
+
+const WebhookURLMap = {
+  'channelID1': 'http://example.com/webhook1',
+  'channelID2': 'http://example.com/webhook2',
+};
 
 app2.use(express.static('src'));
+app2.use(bodyParser.urlencoded({ extended: true }))
+app.use(cors());
 
 app2.get('/', (req, res) => {
+});
+
+app2.post('/', (req, res) => {
+  const postchannelID = req.body.channelid;
+  const postMessage = req.body.message;
+  const postName = req.body.name;
+  const postIconimgLink = req.body.imglink;
+
+  // チャンネルIDに対応するURLを取得
+  const targetUrl = WebhookURLMap[postchannelID];
+
+  if (!targetUrl) {
+    return res.status(400).send('Target URL not found for the provided channel ID');
+  }
+
+  fetch(targetUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username: postName,
+      avatar_url: postIconimgLink,
+      content: postMessage
+    }),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to POST data to the target URL');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Data successfully posted:', data);
+      res.sendStatus(200);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).send('Internal Server Error');
+    });
 });
 
 const client = new Client({

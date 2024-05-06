@@ -2,10 +2,91 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web To Discord</title>
 </head>
 <body>
-    <h1>tst</h1>
+    <select id="endpointSelect">
+      <option value="YOUR_CHANNEL_ID">YOUR_CHANNEL_NAME</option>
+      <option value="YOUR_CHANNEL_ID">YOUR_CHANNEL_NAME</option>
+    </select>
+<div id="messages"></div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const initialEndpoint = 'http://localhost:3001/1221415572043075594'; // 初期のAPIエンドポイント
+  fetchData(initialEndpoint);
+
+  // プルダウンメニューの要素を取得
+  const select = document.getElementById("endpointSelect");
+
+  // プルダウンメニューが変更されたときのイベントリスナーを追加
+  select.addEventListener("change", function() {
+    const selectedValue = select.value;
+    const apiEndpoint = `http://localhost:3001/${selectedValue}`;
+    fetchData(apiEndpoint);
+  });
+});
+
+// データを取得してHTMLを生成する関数
+function fetchData(apiEndpoint) {
+  fetch(apiEndpoint)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('APIサーバーがダウンしています。');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // 既存のHTMLを削除
+      const existingHtml = document.getElementById("messages");
+      existingHtml.innerHTML = "";
+
+      data.forEach(message => {
+        const content = message.content.replace(/["'<>]/g, function(char) {
+          return {
+            '"': '&quot;',
+            "'": '&#039;',
+            '<': '&lt;',
+            '>': '&gt;'
+          }[char];
+        });
+
+        const imageUrl = message.imageUrl ? `<br><img src="${message.imageUrl}" width="300" height="auto"></img>` : '';
+
+        const timestamp = new Date(message.timestamp);
+
+        const html = `
+          <div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+              <img src="${message.author.avatarUrl}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; cursor: pointer;" onclick="fillTextarea('<@${message.author.id}>')">
+              <strong>投稿者:</strong> ${message.author.username}
+            </div>
+            <div style="margin-left: 32px;">
+              <strong>ユーザーID:</strong> ${message.author.id} <br>
+              <strong>内容:</strong> ${content} ${imageUrl} <br>
+              <strong>投稿日時:</strong> ${timestamp.getFullYear()}-${(timestamp.getMonth() + 1).toString().padStart(2, '0')}-${timestamp.getDate().toString().padStart(2, '0')} ${timestamp.getHours().toString().padStart(2, '0')}:${timestamp.getMinutes().toString().padStart(2, '0')}:${timestamp.getSeconds().toString().padStart(2, '0')}
+              <a href="edit.php?messageId=${message.messageId}">編集</a>/
+              <a href="delete.php?messageId=${message.messageId}">削除</a>
+            </div>
+          </div>
+          <hr>
+        `;
+
+        // 既存のHTMLに追加
+        existingHtml.innerHTML += html;
+      });
+    })
+    .catch(error => {
+      console.error(error.message);
+    });
+}
+
+// JavaScript to fill the textarea
+function fillTextarea(text) {
+  const textarea = document.getElementById("content"); // Replace with the actual ID of your textarea
+  textarea.value = text;
+}
+</script>
 </body>
 </html>
