@@ -8,17 +8,33 @@
 </head>
 <body>
   <h1>Web To Discord v2.0</h1>
-    <select id="endpointSelect">
+  <form method="post">
+    <label for="list">送信先:</label><br>
+    <select id="endpointSelect" name="channelid">
       <option value="YOUR_CHANNEL_ID">YOUR_CHANNEL_NAME</option>
       <option value="YOUR_CHANNEL_ID">YOUR_CHANNEL_NAME</option>
-    </select>
+    </select><br>
+      <label for="name">名前:</label><br>
+      <input type="text" id="name" class="inText" name="name" maxlength="35" required><br>
+  <label for="iconImgLink">アイコン画像リンク:</label><br>
+      <input type="text" id="image" class="inText" name="image"><br>
+  
+      <label for="content">内容:</label><br>
+      <textarea id="content" name="content" class="textArea" rows="4" onfocus="colorReset(this)"
+      oninput="textAreaHeightSet(this)"
+      onchange="textAreaHeightSet(this)" maxlength="600" required></textarea><br>
+  
+      <input type="submit" value="送信">
+    </form><br>
 <div id="messages"></div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  const initialEndpoint = 'http://localhost:3001/YOUR_CHANNEL_ID';
+  const initialEndpoint = 'http://localhost:3001/your_channel_ID'; // 初期のAPIエンドポイント
   fetchData(initialEndpoint);
 
+
   const select = document.getElementById("endpointSelect");
+
 
   select.addEventListener("change", function() {
     const selectedValue = select.value;
@@ -40,7 +56,6 @@ let convertMarkdownToHTML = function(text) {
   return text;
 };
 
-// データを取得してHTMLを生成する関数
 function fetchData(apiEndpoint) {
   fetch(apiEndpoint)
     .then(response => {
@@ -81,7 +96,6 @@ function fetchData(apiEndpoint) {
           </div>
           <br>
         `;
-
 
         existingHtml.innerHTML += html;
       });

@@ -1,35 +1,34 @@
 const { Client, GatewayIntentBits } = require('discord.js');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const express = require('express');
 const cors = require('cors');
-
 const app = express();
 const app2 = express();
 
-const port1 = 3001;
-const port2 = 3000;
+const port1 = 3001; // API Server Port
+const port2 = 3000; // Web Server Port
 
-const WebhookURLMap = {
-  'channelID1': 'http://example.com/webhook1',
-  'channelID2': 'http://example.com/webhook2',
-};
-
+app.use(cors())
 app2.use(express.static('src'));
-app2.use(bodyParser.urlencoded({ extended: true }))
-app.use(cors());
+app2.use(bodyParser.urlencoded({ extended: true }));
 
-app2.get('/', (req, res) => {
-});
+app2.get('/', (req, res) => {});
+
+// チャンネルIDとそれに対応するURLを定義
+const channelURLMap = {
+  'YOUR_DISCORD_WEBHOOK_CHANNEL_ID': 'YOUR_DISCORD_WEBHOOK_URL',
+  'YOUR_DISCORD_WEBHOOK_CHANNEL_ID': 'YOUR_DISCORD_WEBHOOK_URL',
+};
 
 app2.post('/', (req, res) => {
   const postchannelID = req.body.channelid;
-  const postMessage = req.body.message;
+  const postMessage = req.body.content;
   const postName = req.body.name;
-  const postIconimgLink = req.body.imglink;
+  const posticonimgLink = req.body.image;
 
   // チャンネルIDに対応するURLを取得
-  const targetUrl = WebhookURLMap[postchannelID];
-
+  const targetUrl = channelURLMap[postchannelID];
+  console.log(targetUrl);
   if (!targetUrl) {
     return res.status(400).send('Target URL not found for the provided channel ID');
   }
@@ -40,9 +39,9 @@ app2.post('/', (req, res) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
+      content: postMessage,
       username: postName,
-      avatar_url: postIconimgLink,
-      content: postMessage
+      avatar_url: posticonimgLink
     }),
   })
     .then(response => {
@@ -57,7 +56,7 @@ app2.post('/', (req, res) => {
     })
     .catch(error => {
       console.error('Error:', error);
-      res.status(500).send('Internal Server Error');
+      res.redirect('http://localhost:3000');
     });
 });
 
@@ -71,22 +70,15 @@ const client = new Client({
 });
 
 const targetServerId = 'YOUR_TARGET_SERVER_ID';
-let messagesCache = {};
 
-app.get('/:channelId', (req, res) => {
+app.get('/:channelId', async (req, res) => {
   const channelId = req.params.channelId;
 
-  if (!messagesCache[channelId]) {
-    fetchMessages(channelId)
-      .then(messages => {
-        messagesCache[channelId] = messages;
-        res.json(messages);
-      })
-      .catch(error => {
-        res.status(500).json({ error: error.message });
-      });
-  } else {
-    res.json(messagesCache[channelId]);
+  try {
+    const messages = await fetchMessages(channelId);
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -123,7 +115,8 @@ app.listen(port1, () => {
 });
 
 app2.listen(port2, () => {
-    console.log(`Web Server is running at http://localhost:${port2}`);
-  });
+  console.log(`Web Server is running at http://localhost:${port2}`);
+});
 
 client.login('YOUR_DISCORD_BOT_TOKEN');
+
